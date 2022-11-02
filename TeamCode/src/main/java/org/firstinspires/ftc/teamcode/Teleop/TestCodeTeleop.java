@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -22,11 +23,13 @@ public class TestCodeTeleop extends OpMode{
     DcMotorEx frontLeft = null;
     DcMotorEx backRight = null;
     DcMotorEx backLeft = null;
+    DcMotorEx elevator = null;
 
     double frontRightPower = 0;
     double frontLeftPower = 0;
     double backRightPower = 0;
     double backLeftPower = 0;
+    double elevatorPower = 0;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -38,11 +41,23 @@ public class TestCodeTeleop extends OpMode{
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
+        elevator = hardwareMap.get(DcMotorEx.class, "elevator");
 
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
+
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        frontRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        frontLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        backRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        backLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
+
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -55,10 +70,10 @@ public class TestCodeTeleop extends OpMode{
 //        elevatorDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //setting PID coefficients
-        frontRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        frontLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        backRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        backLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
+//        frontRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
+//        frontLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
+//        backRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
+//        backLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
 //        intakeDrive.setVelocityPIDFCoefficients(15, 0, 0, 0);
 //        outtakeServo.setPosition(0);
     }
@@ -91,15 +106,38 @@ public class TestCodeTeleop extends OpMode{
         backRightPower = drive + strafe - turn;
         backLeftPower = drive - strafe + turn;
 
-//        frontRight.setPower(frontRightPower);
-//        frontLeft.setPower(frontLeftPower);
-//        backRight.setPower(backRightPower);
-//        backLeft.setPower(backLeftPower);
+//          frontRightPower = drive + turn;
+//          frontLeftPower = drive - turn;
+//          backRightPower = drive + turn;
+//          backLeftPower = drive - turn;
+
+        frontRight.setPower(frontRightPower);
+        frontLeft.setPower(frontLeftPower);
+        backRight.setPower(backRightPower);
+        backLeft.setPower(backLeftPower);
 
         frontRight.setVelocity(frontRightPower*3000);
-        frontLeft.setVelocity(frontRightPower*3000);
-        backRight.setVelocity(frontRightPower*3000);
-        backLeft.setVelocity(frontRightPower*3000);
+        frontLeft.setVelocity(frontLeftPower*3000);
+        backRight.setVelocity(backRightPower*3000);
+        backLeft.setVelocity(backLeftPower*3000);
+
+        //encoder stuff
+//        frontRight.setTargetPosition(448); //gear ratio (16:1 for bot) * 28 ticks per revolution
+//        frontLeft.setTargetPosition(448);
+//        backRight.setTargetPosition(448);
+//        backLeft.setTargetPosition(448);
+////        elevator.setTargetPosition(437);
+//
+//        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        frontRight.setPower(.5);
+        frontLeft.setPower(.5);
+        backRight.setPower(.5);
+        backLeft.setPower(.5);
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left front (%.2f)", frontLeft.getVelocity());

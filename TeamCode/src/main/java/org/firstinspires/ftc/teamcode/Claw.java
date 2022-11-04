@@ -23,5 +23,7 @@ public class Claw extends OpMode {
     public void loop() {
         leftServoPower = (gamepad1.left_stick_x + 1)/2;
         leftServo.setPosition(leftServoPower);
+//        rightServo.setPosition(-1);
     }
+
 }

@@ -28,14 +28,14 @@ public class TestCodeTeleop extends OpMode{
     DcMotorEx elevator = null;
     CRServo leftServo;
     CRServo rightServo;
-    //DcMotor elevator = null;
 
     //elevator variables
     int currentPosition = 0;
     int targetPosition = 0;
-    final int SMALL_POLE_POS = -1445;
+    double input = 0;
+    final int SMALL_POLE_POS = -1545;
     final int MED_POLE_POS = -2489;
-    final int LONG_POLE_POS = -3327;
+    final int LONG_POLE_POS = -3427;
 
     //motor power and servo positions
     double frontRightPower = 0; //motor domain [-1,1]
@@ -43,8 +43,8 @@ public class TestCodeTeleop extends OpMode{
     double backRightPower = 0;
     double backLeftPower = 0;
     double elevatorPower = 0;
-    public double leftServoPosition = 0.5; //servos domain: [0,1]
-    public double rightServoPosition = 0.5;
+    double leftServoPosition = 0.5; //servos domain: [0,1]
+    double rightServoPosition = 0.5;
 
 
     /*
@@ -93,6 +93,7 @@ public class TestCodeTeleop extends OpMode{
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //setting PID coefficients
         frontRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
@@ -123,19 +124,20 @@ public class TestCodeTeleop extends OpMode{
     public void loop() {
         //game pad controls
         double drive = gamepad1.left_stick_y;
-        double strafe = -gamepad1.left_stick_x;
-        double turn = -gamepad1.right_stick_x;
+        double strafe = gamepad1.left_stick_x;
+        double turn = gamepad1.right_stick_x;
         elevatorPower = gamepad2.left_stick_y;
         leftServoPosition = gamepad2.left_stick_x;
         rightServoPosition = -gamepad2.right_stick_x;
         telemetry.addData("left servo pos", leftServo.getPower());
         telemetry.addData("right servo pos", rightServo.getPower());
+        telemetry.addData("elevator pos", elevator.getCurrentPosition());
 
         //wheel equations
-        frontRightPower = drive - strafe - turn;
-        frontLeftPower = drive + strafe + turn;
-        backRightPower = drive + strafe - turn;
-        backLeftPower = drive - strafe + turn;
+        frontRightPower = drive + strafe + turn;
+        frontLeftPower = drive - strafe - turn;
+        backRightPower = drive - strafe + turn;
+        backLeftPower = drive + strafe - turn;
 
         //motor power and servo position
         frontRight.setPower(frontRightPower);
@@ -145,10 +147,9 @@ public class TestCodeTeleop extends OpMode{
         leftServo.setPower(leftServoPosition);
         rightServo.setPower(rightServoPosition);
 
-        frontRight.setVelocity(frontRightPower*3000);
-        frontLeft.setVelocity(frontLeftPower*3000);
-        backRight.setVelocity(backRightPower*3000);
-        backLeft.setVelocity(backLeftPower*3000);
+        frontRight.setVelocity(frontRightPower*1500);
+        frontLeft.setVelocity(frontLeftPower*1500);
+        backRight.setVelocity(backRightPower*1500);
 
 //        frontRight.setTargetPosition(448); //gear ratio (16:1 for bot) * 28 ticks per revolution
 //        frontLeft.setTargetPosition(448);
@@ -164,24 +165,28 @@ public class TestCodeTeleop extends OpMode{
 
         //Elevator Code
         currentPosition = elevator.getCurrentPosition();
+        input = gamepad2.left_stick_y;
 
-        if (gamepad1.a) {
-            elevator.setTargetPosition(-180);
+        if (gamepad2.a) {
+            elevator.setTargetPosition(-140);
             elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            targetPosition = -183;
-        } else if (gamepad1.b) {
+            targetPosition = -140;
+        } else if (gamepad2.b) {
             elevator.setTargetPosition(SMALL_POLE_POS);
             elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             targetPosition = SMALL_POLE_POS;
-        } else if (gamepad1.x) {
+        } else if (gamepad2.x) {
             elevator.setTargetPosition(MED_POLE_POS);
             elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             targetPosition = MED_POLE_POS;
-        } else if (gamepad1.y) {
+        } else if (gamepad2.y) {
             elevator.setTargetPosition(LONG_POLE_POS);
             elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             targetPosition = LONG_POLE_POS;
         }
+//        else if (!(input==0)) {
+//            elevator.setPower(input * 0.6);
+//        }
 
 
         if (targetPosition > currentPosition) {
@@ -194,13 +199,13 @@ public class TestCodeTeleop extends OpMode{
             elevator.setPower(0);
         }
 
-        if (gamepad1.dpad_left) {
+        if (gamepad2.dpad_left) {
             elevator.setPower(0);
         }
-        if (gamepad1.dpad_up) {
+        if (gamepad2.dpad_up) {
             elevator.setPower(.5);
         }
-        if (gamepad1.dpad_down) {
+        if (gamepad2.dpad_down) {
             elevator.setPower(.5);
         }
 

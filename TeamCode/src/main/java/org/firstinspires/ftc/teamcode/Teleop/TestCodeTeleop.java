@@ -167,26 +167,28 @@ public class TestCodeTeleop extends OpMode{
         currentPosition = elevator.getCurrentPosition();
         input = gamepad2.left_stick_y;
 
-        if (gamepad2.a) {
-            elevator.setTargetPosition(-140);
-            elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            targetPosition = -140;
-        } else if (gamepad2.b) {
-            elevator.setTargetPosition(SMALL_POLE_POS);
-            elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            targetPosition = SMALL_POLE_POS;
-        } else if (gamepad2.x) {
-            elevator.setTargetPosition(MED_POLE_POS);
-            elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            targetPosition = MED_POLE_POS;
-        } else if (gamepad2.y) {
-            elevator.setTargetPosition(LONG_POLE_POS);
-            elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            targetPosition = LONG_POLE_POS;
+        //potential fix for making elevator move with joystick?
+        if (!(input==0)) {
+            if (gamepad2.a) {
+                elevator.setTargetPosition(-140);
+                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                targetPosition = -140;
+            } else if (gamepad2.b) {
+                elevator.setTargetPosition(SMALL_POLE_POS);
+                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                targetPosition = SMALL_POLE_POS;
+            } else if (gamepad2.x) {
+                elevator.setTargetPosition(MED_POLE_POS);
+                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                targetPosition = MED_POLE_POS;
+            } else if (gamepad2.y) {
+                elevator.setTargetPosition(LONG_POLE_POS);
+                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                targetPosition = LONG_POLE_POS;
+            }
+        } else {
+            elevator.setPower(input * 0.6);
         }
-//        else if (!(input==0)) {
-//            elevator.setPower(input * 0.6);
-//        }
 
 
         if (targetPosition > currentPosition) {
@@ -199,15 +201,15 @@ public class TestCodeTeleop extends OpMode{
             elevator.setPower(0);
         }
 
-        if (gamepad2.dpad_left) {
-            elevator.setPower(0);
-        }
-        if (gamepad2.dpad_up) {
-            elevator.setPower(.5);
-        }
-        if (gamepad2.dpad_down) {
-            elevator.setPower(.5);
-        }
+//        if (gamepad2.dpad_left) {
+//            elevator.setPower(0);
+//        }
+//        if (gamepad2.dpad_up) {
+//            elevator.setPower(.5);
+//        }
+//        if (gamepad2.dpad_down) {
+//            elevator.setPower(.5);
+//        }
 
     }
 

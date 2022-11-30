@@ -26,8 +26,7 @@ public class TestCodeTeleop extends OpMode{
     DcMotorEx backRight = null;
     DcMotorEx backLeft = null;
     DcMotorEx elevator = null;
-    CRServo leftServo;
-    CRServo rightServo;
+    Servo claw = null;
 
     //elevator variables
     int currentPosition = 0;
@@ -43,8 +42,7 @@ public class TestCodeTeleop extends OpMode{
     double backRightPower = 0;
     double backLeftPower = 0;
     double elevatorPower = 0;
-    double leftServoPosition = 0.5; //servos domain: [0,1]
-    double rightServoPosition = 0.5;
+    double clawPosition = 0.5;
 
 
     /*
@@ -58,8 +56,7 @@ public class TestCodeTeleop extends OpMode{
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         elevator = hardwareMap.get(DcMotorEx.class, "elevator");
-        leftServo = hardwareMap.get(CRServo.class, "leftServo");
-        rightServo = hardwareMap.get(CRServo.class, "rightServo");
+        claw = hardwareMap.get(Servo.class, "claw");
 
         //motor and servo directions
         frontRight.setDirection(DcMotor.Direction.FORWARD);
@@ -67,8 +64,7 @@ public class TestCodeTeleop extends OpMode{
         backRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        leftServo.setDirection(CRServo.Direction.FORWARD);
-        rightServo.setDirection(CRServo.Direction.REVERSE);
+        claw.setDirection(Servo.Direction.FORWARD);
 
 //        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -127,10 +123,6 @@ public class TestCodeTeleop extends OpMode{
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
         elevatorPower = gamepad2.left_stick_y;
-        leftServoPosition = gamepad2.left_stick_x;
-        rightServoPosition = -gamepad2.right_stick_x;
-        telemetry.addData("left servo pos", leftServo.getPower());
-        telemetry.addData("right servo pos", rightServo.getPower());
         telemetry.addData("elevator pos", elevator.getCurrentPosition());
 
         //wheel equations
@@ -144,8 +136,7 @@ public class TestCodeTeleop extends OpMode{
         frontLeft.setPower(frontLeftPower);
         backRight.setPower(backRightPower);
         backLeft.setPower(backLeftPower);
-        leftServo.setPower(leftServoPosition);
-        rightServo.setPower(rightServoPosition);
+        claw.setPosition(clawPosition);
 
         frontRight.setVelocity(frontRightPower*1500);
         frontLeft.setVelocity(frontLeftPower*1500);
@@ -168,6 +159,13 @@ public class TestCodeTeleop extends OpMode{
         input = gamepad2.left_stick_y;
 
         //potential fix for making elevator move with joystick?
+        if (gamepad2.left_bumper) {
+            claw.setPosition(1);
+        }
+        if (gamepad2.right_bumper) {
+            claw.setPosition(0);
+        }
+
         if (!(input==0)) {
             if (gamepad2.a) {
                 elevator.setTargetPosition(-140);

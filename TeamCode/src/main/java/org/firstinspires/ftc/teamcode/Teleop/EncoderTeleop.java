@@ -25,7 +25,5 @@ public class EncoderTeleop extends OpMode {
             elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
         telemetry.addData("elevator position", elevator.getCurrentPosition());
-
-        //lowPos =
     }
 }

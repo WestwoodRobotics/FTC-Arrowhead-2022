@@ -1,15 +1,15 @@
+// This TeleOp is our main TeleOp!!
+
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When an selection is made from the menu, the corresponding OpMode
@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class TestCodeTeleop extends OpMode{
     private ElapsedTime runtime = new ElapsedTime();
 
-    //declare wheels, servo, and elevator
+    //objects
     DcMotorEx frontRight = null;
     DcMotorEx frontLeft = null;
     DcMotorEx backRight = null;
@@ -31,19 +31,15 @@ public class TestCodeTeleop extends OpMode{
     //elevator variables
     int currentPosition = 0;
     int targetPosition = 0;
-    double input = 0;
-    final int SMALL_POLE_POS = -1545;
-    final int MED_POLE_POS = -2489;
-    final int LONG_POLE_POS = -3427;
+    final int SMALL_POLE_POS = 7572;
+    final int MED_POLE_POS = 11546;
+    final int LONG_POLE_POS = 14313;
 
     //motor power and servo positions
     double frontRightPower = 0; //motor domain [-1,1]
     double frontLeftPower = 0;
     double backRightPower = 0;
     double backLeftPower = 0;
-    double elevatorPower = 0;
-    double clawPosition = 0.5;
-
 
     /*
      * Code to run ONCE when the driver hits INIT (on the driver hub)
@@ -63,26 +59,12 @@ public class TestCodeTeleop extends OpMode{
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.REVERSE);
         claw.setDirection(Servo.Direction.FORWARD);
 
-//        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER)
-
-//        frontRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
-//        frontLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
-//        backRight.setMode(DcMotor.RunMode.RESET_ENCODERS);
-//        backLeft.setMode(DcMotor.RunMode.RESET_ENCODERS);
-
-        //elevator encoder
+        //elevator encoder for set positions
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        elevator.setMode(DcMotor.RunMode.RESET_ENCODERS);
-
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
         //Zero Power Behavior: full break when motor input = 0;
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -96,6 +78,10 @@ public class TestCodeTeleop extends OpMode{
         frontLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
         backRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
         backLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
+
+        //text on driver hub to let us know robot has been initialized
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -111,6 +97,14 @@ public class TestCodeTeleop extends OpMode{
     @Override
     public void start() {
         runtime.reset();
+
+        //so that claw opens up a bit when game starts
+        claw.setPosition(0.5);
+
+        //so that elevator moves to cone height when the game starts
+        targetPosition = 617;
+        elevator.setTargetPosition(targetPosition);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /*
@@ -118,47 +112,22 @@ public class TestCodeTeleop extends OpMode{
      */
     @Override
     public void loop() {
-        //game pad controls
+//------------------------------------------- WHEELS -------------------------------------
         double drive = gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
-        elevatorPower = gamepad2.left_stick_y;
-        telemetry.addData("elevator pos", elevator.getCurrentPosition());
 
-        //wheel equations
-        frontRightPower = drive + strafe + turn;
-        frontLeftPower = drive - strafe - turn;
-        backRightPower = drive - strafe + turn;
-        backLeftPower = drive + strafe - turn;
-
-        //motor power and servo position
-        frontRight.setPower(frontRightPower);
-        frontLeft.setPower(frontLeftPower);
-        backRight.setPower(backRightPower);
-        backLeft.setPower(backLeftPower);
-        claw.setPosition(clawPosition);
+        frontRightPower = drive - strafe - turn;
+        frontLeftPower = drive + strafe + turn;
+        backRightPower = drive + strafe - turn;
+        backLeftPower = drive - strafe + turn;
 
         frontRight.setVelocity(frontRightPower*1500);
         frontLeft.setVelocity(frontLeftPower*1500);
         backRight.setVelocity(backRightPower*1500);
+        backLeft.setVelocity(backLeftPower*1500);
 
-//        frontRight.setTargetPosition(448); //gear ratio (16:1 for bot) * 28 ticks per revolution
-//        frontLeft.setTargetPosition(448);
-//        backRight.setTargetPosition(448);
-//        backLeft.setTargetPosition(448);
-//        elevator.setTargetPosition(448);
-
-//        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        //Elevator Code
-        currentPosition = elevator.getCurrentPosition();
-        input = gamepad2.left_stick_y;
-
-        //potential fix for making elevator move with joystick?
+        //claw
         if (gamepad2.left_bumper) {
             claw.setPosition(1);
         }
@@ -166,48 +135,56 @@ public class TestCodeTeleop extends OpMode{
             claw.setPosition(0);
         }
 
-        if (!(input==0)) {
-            if (gamepad2.a) {
-                elevator.setTargetPosition(-140);
-                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                targetPosition = -140;
-            } else if (gamepad2.b) {
-                elevator.setTargetPosition(SMALL_POLE_POS);
-                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                targetPosition = SMALL_POLE_POS;
-            } else if (gamepad2.x) {
-                elevator.setTargetPosition(MED_POLE_POS);
-                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                targetPosition = MED_POLE_POS;
-            } else if (gamepad2.y) {
-                elevator.setTargetPosition(LONG_POLE_POS);
-                elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                targetPosition = LONG_POLE_POS;
-            }
-        } else {
-            elevator.setPower(input * 0.6);
-        }
+//----------------------------------------ELEVATOR----------------------------------------------
+        currentPosition = elevator.getCurrentPosition();
 
+        //manual controls using trigger
+        if (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0) {
+            if (gamepad2.right_trigger > 0) {
+                targetPosition += 20;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else if (gamepad2.left_trigger > 0) {
+                targetPosition -= 20;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+        } else { //pre-defined pole heights using abxy buttons
+            if (gamepad2.a) {
+                targetPosition = 617;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else if (gamepad2.b) {
+                targetPosition = SMALL_POLE_POS;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else if (gamepad2.x) {
+                targetPosition = MED_POLE_POS;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } else if (gamepad2.y) {
+                targetPosition = LONG_POLE_POS;
+                elevator.setTargetPosition(targetPosition);
+                elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+        }
 
         if (targetPosition > currentPosition) {
             elevator.setPower(1);
         }
         else if (currentPosition > targetPosition) {
-            elevator.setPower(1);
+            elevator.setPower(-1);
         }
         else if (currentPosition == targetPosition) {
             elevator.setPower(0);
         }
 
-//        if (gamepad2.dpad_left) {
-//            elevator.setPower(0);
-//        }
-//        if (gamepad2.dpad_up) {
-//            elevator.setPower(.5);
-//        }
-//        if (gamepad2.dpad_down) {
-//            elevator.setPower(.5);
-//        }
+        //limits
+        if (targetPosition > 10000) {
+            targetPosition = 10000;
+        } else if (targetPosition < 0) {
+            targetPosition = 0;
+        }
 
     }
 

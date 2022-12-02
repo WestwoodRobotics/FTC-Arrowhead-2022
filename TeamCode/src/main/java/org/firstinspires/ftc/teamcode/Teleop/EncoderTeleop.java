@@ -1,4 +1,4 @@
-//This is used to test viper slide
+//This TeleOp is used to find the pole heights for encoder
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

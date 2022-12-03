@@ -31,9 +31,9 @@ public class TestCodeTeleop extends OpMode{
     //elevator variables
     int currentPosition = 0;
     int targetPosition = 0;
-    final int SMALL_POLE_POS = 7572;
-    final int MED_POLE_POS = 11546;
-    final int LONG_POLE_POS = 14313;
+    final int SMALL_POLE_POS = 1695;
+    final int MED_POLE_POS = 2359;
+    final int LONG_POLE_POS = 3459;
 
     //motor power and servo positions
     double frontRightPower = 0; //motor domain [-1,1]
@@ -102,7 +102,7 @@ public class TestCodeTeleop extends OpMode{
         claw.setPosition(0.5);
 
         //so that elevator moves to cone height when the game starts
-        targetPosition = 617;
+        targetPosition = 200;
         elevator.setTargetPosition(targetPosition);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
@@ -141,17 +141,17 @@ public class TestCodeTeleop extends OpMode{
         //manual controls using trigger
         if (gamepad2.left_trigger > 0 || gamepad2.right_trigger > 0) {
             if (gamepad2.right_trigger > 0) {
-                targetPosition += 20;
+                targetPosition -= 20;
                 elevator.setTargetPosition(targetPosition);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             } else if (gamepad2.left_trigger > 0) {
-                targetPosition -= 20;
+                targetPosition += 20;
                 elevator.setTargetPosition(targetPosition);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
         } else { //pre-defined pole heights using abxy buttons
             if (gamepad2.a) {
-                targetPosition = 617;
+                targetPosition = 200;
                 elevator.setTargetPosition(targetPosition);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             } else if (gamepad2.b) {
@@ -180,8 +180,8 @@ public class TestCodeTeleop extends OpMode{
         }
 
         //limits
-        if (targetPosition > 10000) {
-            targetPosition = 10000;
+        if (targetPosition > 4000) {
+            targetPosition = 4000;
         } else if (targetPosition < 0) {
             targetPosition = 0;
         }

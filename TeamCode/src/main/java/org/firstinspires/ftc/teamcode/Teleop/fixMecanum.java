@@ -25,18 +25,18 @@ public class fixMecanum extends OpMode{
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
 
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
     }
 
     @Override
     public void loop() {
-        frontRight.setPower(0.5);
-        frontLeft.setPower(0.5);
-        backRight.setPower(0.5);
-        backLeft.setPower(0.5);
+//        frontRight.setPower(0.1);
+//        frontLeft.setPower(0.1);
+//        backRight.setPower(0.1);
+//        backLeft.setPower(0.1);
 
         double drive = gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;

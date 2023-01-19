@@ -1,5 +1,3 @@
-//This is our final auton!!
-
 /*
  * Copyright (c) 2021 OpenFTC Team
  *
@@ -21,49 +19,22 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Autons;
+package org.firstinspires.ftc.teamcode.autons.aprilTagResources;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Autons.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous
-public class TestAuton extends LinearOpMode
+@TeleOp
+public class AprilTagAutonomousInitDetection extends LinearOpMode
 {
-    //INTRODUCE VARIABLES HERE
-    private ElapsedTime runtime = new ElapsedTime();
-
-    DcMotorEx frontRight = null;
-    DcMotorEx frontLeft = null;
-    DcMotorEx backRight = null;
-    DcMotorEx backLeft = null;
-    DcMotorEx elevator = null;
-    Servo claw = null;
-
-    int currentPosition = 0;
-    int targetPosition = 0;
-    final int SMALL_POLE_POS = 7572;
-    final int MED_POLE_POS = 11546;
-    final int LONG_POLE_POS = 14313;
-
-    double frontRightPower = 0; //motor domain [-1,1]
-    double frontLeftPower = 0;
-    double backRightPower = 0;
-    double backLeftPower = 0;
-
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -82,8 +53,6 @@ public class TestAuton extends LinearOpMode
     double tagsize = 0.166;
 
     // Tag ID 1,2,3 from the 36h11 family
-    /*EDIT IF NEEDED!!!*/
-
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
@@ -114,40 +83,6 @@ public class TestAuton extends LinearOpMode
         });
 
         telemetry.setMsTransmissionInterval(50);
-
-
-        //HARDWARE MAPPING HERE etc.
-        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
-        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
-        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
-        elevator = hardwareMap.get(DcMotorEx.class, "elevator");
-        claw = hardwareMap.get(Servo.class, "claw");
-
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-        elevator.setDirection(DcMotor.Direction.REVERSE);
-        claw.setDirection(Servo.Direction.FORWARD);
-
-        //elevator encoder for set positions
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        //Zero Power Behavior: full break when motor input = 0;
-        frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        //setting PID coefficients
-        frontRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        frontLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        backRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
-        backLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
-
 
         /*
          * The INIT-loop:
@@ -212,10 +147,12 @@ public class TestAuton extends LinearOpMode
             sleep(20);
         }
 
+        /*
+         * The START command just came in: now work off the latest snapshot acquired
+         * during the init loop.
+         */
 
-
-
-
+        /* Update the telemetry */
         if(tagOfInterest != null)
         {
             telemetry.addLine("Tag snapshot:\n");
@@ -228,39 +165,18 @@ public class TestAuton extends LinearOpMode
             telemetry.update();
         }
 
-        //PUT AUTON CODE HERE (DRIVER PRESSED THE PLAY BUTTON!)
-        targetPosition = 200;
-        elevator.setTargetPosition(targetPosition);
-        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        claw.setPosition(0);
-
-        if(tagOfInterest.id == LEFT) {
-            frontRight.setPower(1);
-            frontLeft.setPower(1);
-            backRight.setPower(1);
-            backLeft.setPower(1);
-            runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 3.0)) {
-                telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
-                telemetry.update();
-            }
-
-            frontRight.setPower(1);
-            frontLeft.setPower(-1);
-            backRight.setPower(1);
-            backLeft.setPower(-1);
-            targetPosition = MED_POLE_POS;
-            elevator.setTargetPosition(targetPosition);
-            elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            runtime.reset();
-            while (opModeIsActive() && (runtime.seconds() < 0.5)) {
-                telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
-                telemetry.update();
-            }
-
-
+        /* Actually do something useful */
+        if(tagOfInterest == null || tagOfInterest.id == LEFT){
+            //trajectory
+        }else if(tagOfInterest.id == MIDDLE){
+            //trajectory
+        }else{
+            //trajectory
         }
 
+
+        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
+        while (opModeIsActive()) {sleep(20);}
     }
 
     void tagToTelemetry(AprilTagDetection detection)

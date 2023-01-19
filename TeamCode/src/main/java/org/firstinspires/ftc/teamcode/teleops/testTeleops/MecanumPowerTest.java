@@ -1,5 +1,5 @@
 //This TeleOp is used to make sure our wheel motor directions are correct
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.teleops.testTeleops;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp
-public class fixMecanum extends OpMode{
+public class MecanumPowerTest extends OpMode{
     DcMotorEx frontRight = null;
     DcMotorEx frontLeft = null;
     DcMotorEx backRight = null;
@@ -33,19 +33,10 @@ public class fixMecanum extends OpMode{
 
     @Override
     public void loop() {
-//        frontRight.setPower(0.1);
-//        frontLeft.setPower(0.1);
-//        backRight.setPower(0.1);
-//        backLeft.setPower(0.1);
-
-        double drive = gamepad1.left_stick_y;
-        double strafe = gamepad1.left_stick_x;
-        double turn = gamepad1.right_stick_x;
-
-        frontRightPower = drive - strafe - turn;
-        frontLeftPower = drive + strafe + turn;
-        backRightPower = drive + strafe - turn;
-        backLeftPower = drive - strafe + turn;
+        frontRight.setPower(0.1);
+        frontLeft.setPower(0.1);
+        backRight.setPower(0.1);
+        backLeft.setPower(0.1);
 
     }
 

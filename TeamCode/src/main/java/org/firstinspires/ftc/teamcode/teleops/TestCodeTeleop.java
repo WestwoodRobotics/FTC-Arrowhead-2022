@@ -1,6 +1,6 @@
 // This TeleOp is our main TeleOp!!
 
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.teleops;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -26,14 +26,14 @@ public class TestCodeTeleop extends OpMode{
     DcMotorEx backRight = null;
     DcMotorEx backLeft = null;
     DcMotorEx elevator = null;
-    Servo claw = null;
+    Servo intake = null;
 
     //elevator variables
     int currentPosition = 0;
     int targetPosition = 0;
-    final int SMALL_POLE_POS = 1695;
-    final int MED_POLE_POS = 2359;
-    final int LONG_POLE_POS = 3459;
+    final int SMALL_POLE_POS = 1292;
+    final int MED_POLE_POS = 2239;
+    final int LONG_POLE_POS = 3083;
 
     //motor power and servo positions
     double frontRightPower = 0; //motor domain [-1,1]
@@ -52,15 +52,15 @@ public class TestCodeTeleop extends OpMode{
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         elevator = hardwareMap.get(DcMotorEx.class, "elevator");
-        claw = hardwareMap.get(Servo.class, "claw");
+        intake = hardwareMap.get(Servo.class, "intake");
 
         //motor and servo directions
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.REVERSE);
-        claw.setDirection(Servo.Direction.FORWARD);
+        intake.setDirection(Servo.Direction.FORWARD);
 
         //elevator encoder for set positions
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -97,14 +97,6 @@ public class TestCodeTeleop extends OpMode{
     @Override
     public void start() {
         runtime.reset();
-
-        //so that claw opens up a bit when game starts
-        claw.setPosition(0.5);
-
-        //so that elevator moves to cone height when the game starts
-        targetPosition = 200;
-        elevator.setTargetPosition(targetPosition);
-        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     /*
@@ -113,7 +105,7 @@ public class TestCodeTeleop extends OpMode{
     @Override
     public void loop() {
 //------------------------------------------- WHEELS -------------------------------------
-        double drive = gamepad1.left_stick_y;
+        double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
 
@@ -127,12 +119,17 @@ public class TestCodeTeleop extends OpMode{
         backRight.setVelocity(backRightPower*1500);
         backLeft.setVelocity(backLeftPower*1500);
 
-        //claw
+        //intake
+        //in
         if (gamepad2.left_bumper) {
-            claw.setPosition(1);
+            targetPosition -=200;
+            elevator.setTargetPosition(targetPosition);
+            elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            intake.setPosition(0.4);
         }
+        //out
         if (gamepad2.right_bumper) {
-            claw.setPosition(0);
+            intake.setPosition(0.0);
         }
 
 //----------------------------------------ELEVATOR----------------------------------------------
@@ -151,7 +148,7 @@ public class TestCodeTeleop extends OpMode{
             }
         } else { //pre-defined pole heights using abxy buttons
             if (gamepad2.a) {
-                targetPosition = 200;
+                targetPosition = 350;
                 elevator.setTargetPosition(targetPosition);
                 elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             } else if (gamepad2.b) {
@@ -170,10 +167,10 @@ public class TestCodeTeleop extends OpMode{
         }
 
         if (targetPosition > currentPosition) {
-            elevator.setPower(1);
+            elevator.setPower(0.8);
         }
         else if (currentPosition > targetPosition) {
-            elevator.setPower(-1);
+            elevator.setPower(-0.8);
         }
         else if (currentPosition == targetPosition) {
             elevator.setPower(0);
@@ -186,6 +183,11 @@ public class TestCodeTeleop extends OpMode{
             targetPosition = 0;
         }
 
+        telemetry.addData("elevator pos: ", elevator.getCurrentPosition());
+        telemetry.addData("frontRight pos: ", frontRight.getCurrentPosition());
+        telemetry.addData("frontLeft pos: ", frontLeft.getCurrentPosition());
+        telemetry.addData("backRight pos: ", backRight.getCurrentPosition());
+        telemetry.addData("backLeft pos: ", backLeft.getCurrentPosition());
     }
 
     /*

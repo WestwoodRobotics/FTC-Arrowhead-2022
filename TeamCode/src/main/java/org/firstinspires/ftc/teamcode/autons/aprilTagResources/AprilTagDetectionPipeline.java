@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Autons;
+package org.firstinspires.ftc.teamcode.autons.aprilTagResources;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;

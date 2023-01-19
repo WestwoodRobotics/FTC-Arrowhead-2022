@@ -1,3 +1,5 @@
+//This is our safety auton
+
 /*
  * Copyright (c) 2021 OpenFTC Team
  *
@@ -19,23 +21,39 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Autons;
+package org.firstinspires.ftc.teamcode.autons.timeBased;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.autons.aprilTagResources.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.firstinspires.ftc.teamcode.Autons.AprilTagDetectionPipeline;
 
 import java.util.ArrayList;
 
-@TeleOp
-public class AprilTagAutonomousInitDetection extends LinearOpMode
+@Autonomous
+public class  TestAuton extends LinearOpMode
 {
+    //INTRODUCE VARIABLES HERE
+    private ElapsedTime runtime = new ElapsedTime();
+
+    DcMotorEx frontRight = null;
+    DcMotorEx frontLeft = null;
+    DcMotorEx backRight = null;
+    DcMotorEx backLeft = null;
+
+    double frontRightPower = 0; //motor domain [-1,1]
+    double frontLeftPower = 0;
+    double backRightPower = 0;
+    double backLeftPower = 0;
+
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
@@ -54,6 +72,8 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode
     double tagsize = 0.166;
 
     // Tag ID 1,2,3 from the 36h11 family
+    /*EDIT IF NEEDED!!!*/
+
     int LEFT = 1;
     int MIDDLE = 2;
     int RIGHT = 3;
@@ -84,6 +104,31 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode
         });
 
         telemetry.setMsTransmissionInterval(50);
+
+
+        //HARDWARE MAPPING HERE etc.
+        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
+
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        //Zero Power Behavior: full break when motor input = 0;
+        frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        //setting PID coefficients
+        frontRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
+        frontLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
+        backRight.setVelocityPIDFCoefficients(15, 0, 0, 0);
+        backLeft.setVelocityPIDFCoefficients(15, 0, 0, 0);
+
 
         /*
          * The INIT-loop:
@@ -148,12 +193,10 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode
             sleep(20);
         }
 
-        /*
-         * The START command just came in: now work off the latest snapshot acquired
-         * during the init loop.
-         */
 
-        /* Update the telemetry */
+
+
+
         if(tagOfInterest != null)
         {
             telemetry.addLine("Tag snapshot:\n");
@@ -166,18 +209,80 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode
             telemetry.update();
         }
 
-        /* Actually do something useful */
-        if(tagOfInterest == null || tagOfInterest.id == LEFT){
-            //trajectory
-        }else if(tagOfInterest.id == MIDDLE){
-            //trajectory
-        }else{
-            //trajectory
+        //PUT AUTON CODE HERE (DRIVER PRESSED THE PLAY BUTTON!)
+
+        if(tagOfInterest.id == LEFT) {
+            frontRight.setPower(0.5);
+            frontLeft.setPower(0.5);
+            backRight.setPower(0.5);
+            backLeft.setPower(0.5);
+            runtime.reset();
+            sleep(800);
+
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            backRight.setPower(0);
+            backLeft.setPower(0);
+            sleep(200);
+
+            frontRight.setPower(0.5);
+            frontLeft.setPower(-0.5);
+            backRight.setPower(-0.5);
+            backLeft.setPower(0.5);
+            sleep(1200);
+
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            backRight.setPower(0);
+            backLeft.setPower(0);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            sleep(1000);
+
+        } else if (tagOfInterest.id == MIDDLE) {
+            frontRight.setPower(0.5);
+            frontLeft.setPower(0.5);
+            backRight.setPower(0.5);
+            backLeft.setPower(0.5);
+            sleep(800);
+
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            backRight.setPower(0);
+            backLeft.setPower(0);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            sleep(1000);
+
+        } else if (tagOfInterest.id == RIGHT) {
+            frontRight.setPower(0.5);
+            frontLeft.setPower(0.5);
+            backRight.setPower(0.5);
+            backLeft.setPower(0.5);
+            runtime.reset();
+            sleep(800);
+
+            frontRight.setPower(-0.5);
+            frontLeft.setPower(0.5);
+            backRight.setPower(0.5);
+            backLeft.setPower(-0.5);
+            sleep(1200);
+
+            frontRight.setPower(0);
+            frontLeft.setPower(0);
+            backRight.setPower(0);
+            backLeft.setPower(0);
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+            sleep(10000);
+        } else {
+            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
+            telemetry.update();
         }
 
-
-        /* You wouldn't have this in your autonomous, this is just to prevent the sample from ending */
-        while (opModeIsActive()) {sleep(20);}
     }
 
     void tagToTelemetry(AprilTagDetection detection)
